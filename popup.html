@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="popup.css" />
+    <title>Prompt Safeguard</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="monogram">P</span>
+        <div><div class="eyebrow">PROMPT SAFEGUARD</div><strong>Site Access</strong></div>
+        <span class="version">3.1.1</span>
+      </header>
+
+      <section class="site-card">
+        <div class="site-topline">
+          <span class="site-adapter" id="site-adapter">正在识别…</span>
+          <span class="site-mode" id="site-mode"></span>
+        </div>
+        <h1 id="site-host">当前网站</h1>
+        <p id="site-description">检查此网站是否已启用 Prompt Vault。</p>
+      </section>
+
+      <section class="permission-status" id="permission-status" data-state="loading">
+        <span class="signal"></span>
+        <span id="status-copy">正在检查权限…</span>
+      </section>
+
+      <div class="actions">
+        <button class="primary" id="primary-action" type="button" disabled>请稍候</button>
+        <button class="secondary" id="pick-editor" type="button" hidden>重新选择输入框</button>
+        <button class="quiet" id="disable-site" type="button" hidden>在此网站停用</button>
+      </div>
+
+      <p class="privacy">仅在你授权的网站运行。Prompt、历史和文件夹保存在本机，不会上传。</p>
+      <p class="message" id="message" role="status"></p>
+    </main>
+    <script src="adapters.js"></script>
+    <script src="site-manager.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
