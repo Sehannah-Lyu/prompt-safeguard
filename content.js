@@ -145,15 +145,19 @@
     if (!rect) return;
 
     const gutter = 12;
-    const width = Math.max(180, Math.min(rect.width || 768, 768, window.innerWidth - gutter * 2));
-    const left = Math.max(gutter, Math.min(rect.left || gutter, window.innerWidth - width - gutter));
+    const dockWidth = Math.min(250, Math.max(44, (rect.width || 0) - gutter * 2));
+    const left = Math.max(gutter, Math.min((rect.right || window.innerWidth) - dockWidth - gutter, window.innerWidth - dockWidth - gutter));
     const triggerHeight = trigger?.offsetHeight || 28;
-    const triggerTop = Math.max(gutter, Math.min((rect.top || gutter) - triggerHeight - 8, window.innerHeight - triggerHeight - gutter));
+    // Dock in the empty upper-right area of the composer. This leaves the
+    // typing start and the action toolbar unobstructed on sites such as Doubao.
+    const triggerTop = Math.max(gutter, Math.min((rect.top || gutter) + gutter, window.innerHeight - triggerHeight - gutter));
 
-    if (trigger?.isConnected) Object.assign(trigger.style, { left: `${left}px`, top: `${triggerTop}px`, width: `${width}px` });
+    if (trigger?.isConnected) Object.assign(trigger.style, { left: `${left}px`, top: `${triggerTop}px`, width: `${dockWidth}px` });
     if (restoreBar?.isConnected) {
       const restoreHeight = restoreBar.offsetHeight || 54;
-      Object.assign(restoreBar.style, { left: `${left}px`, top: `${Math.max(gutter, triggerTop - restoreHeight - 8)}px`, width: `${width}px` });
+      const restoreWidth = Math.min(360, Math.max(220, (rect.width || 0) - gutter * 2));
+      const restoreLeft = Math.max(gutter, Math.min((rect.right || window.innerWidth) - restoreWidth - gutter, window.innerWidth - restoreWidth - gutter));
+      Object.assign(restoreBar.style, { left: `${restoreLeft}px`, top: `${Math.max(gutter, (rect.top || gutter) - restoreHeight - 8)}px`, width: `${restoreWidth}px` });
     }
   }
 

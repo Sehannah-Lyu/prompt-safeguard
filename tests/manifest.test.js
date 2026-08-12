@@ -12,7 +12,7 @@ const expected = [
   "https://chat.deepseek.com/*"
 ];
 
-assert.equal(manifest.version, "3.1.1");
+assert.equal(manifest.version, "3.1.2");
 assert.equal(manifest.content_scripts.length, 1);
 for (const pattern of expected) {
   assert.ok(manifest.host_permissions.includes(pattern), `missing required permission: ${pattern}`);

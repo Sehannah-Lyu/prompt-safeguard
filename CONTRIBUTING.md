@@ -25,6 +25,7 @@ node --check popup.js
 node tests\core.test.js
 node tests\adapters.test.js
 node tests\content-layout.test.js
+node tests\exact-adapter-contract.test.js
 node tests\manifest.test.js
 ```
 
