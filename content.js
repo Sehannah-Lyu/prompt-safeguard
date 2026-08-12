@@ -136,14 +136,30 @@
     notifyEditor(text);
   }
 
-  function mountAboveComposer(element) {
-    const anchor = Adapters.findComposerAnchor(adapter, editor);
-    if (anchor?.parentElement) {
-      if (element.parentElement === anchor.parentElement && element.nextElementSibling === anchor) return;
-      anchor.parentElement.insertBefore(element, anchor);
-      return;
+  // Keep extension UI out of the host site's composer DOM. Several chat sites
+  // use a Flex/Grid composer; inserting a sibling there can squeeze the editor.
+  function positionComposerDock() {
+    if (!trigger?.isConnected && !restoreBar?.isConnected) return;
+    const anchor = Adapters.findComposerAnchor(adapter, editor) || editor;
+    const rect = anchor?.getBoundingClientRect?.();
+    if (!rect) return;
+
+    const gutter = 12;
+    const width = Math.max(180, Math.min(rect.width || 768, 768, window.innerWidth - gutter * 2));
+    const left = Math.max(gutter, Math.min(rect.left || gutter, window.innerWidth - width - gutter));
+    const triggerHeight = trigger?.offsetHeight || 28;
+    const triggerTop = Math.max(gutter, Math.min((rect.top || gutter) - triggerHeight - 8, window.innerHeight - triggerHeight - gutter));
+
+    if (trigger?.isConnected) Object.assign(trigger.style, { left: `${left}px`, top: `${triggerTop}px`, width: `${width}px` });
+    if (restoreBar?.isConnected) {
+      const restoreHeight = restoreBar.offsetHeight || 54;
+      Object.assign(restoreBar.style, { left: `${left}px`, top: `${Math.max(gutter, triggerTop - restoreHeight - 8)}px`, width: `${width}px` });
     }
-    editor?.parentElement?.appendChild(element);
+  }
+
+  function mountAboveComposer(element) {
+    if (!element?.isConnected) document.body.appendChild(element);
+    window.requestAnimationFrame(positionComposerDock);
   }
 
   function setProtectionStatus(label, state = "ready") {
@@ -671,6 +687,10 @@
     window.requestAnimationFrame(scanForEditor);
   }
 
+  function scheduleDockPosition() {
+    window.requestAnimationFrame(positionComposerDock);
+  }
+
   function handleDocumentClick(event) {
     if (Adapters.isSendControl(adapter, event.target)) submitted();
   }
@@ -704,6 +724,8 @@
     observer?.disconnect();
     if (saveInterval) window.clearInterval(saveInterval);
     document.removeEventListener("click", handleDocumentClick, true);
+    window.removeEventListener("resize", scheduleDockPosition);
+    window.removeEventListener("scroll", scheduleDockPosition, true);
     clearPicker();
     trigger?.remove();
     panel?.remove();
@@ -721,6 +743,8 @@
     observer = new MutationObserver(scheduleScan);
     observer.observe(document.documentElement, { childList: true, subtree: true });
     document.addEventListener("click", handleDocumentClick, true);
+    window.addEventListener("resize", scheduleDockPosition, { passive: true });
+    window.addEventListener("scroll", scheduleDockPosition, { passive: true, capture: true });
     saveInterval = window.setInterval(saveSnapshot, 5000);
   }
 

@@ -150,6 +150,7 @@ flowchart TB
 ```powershell
 node --check core.js
 node --check adapters.js
+node tests\content-layout.test.js
 node --check content.js
 node --check popup.js
 node tests\core.test.js
