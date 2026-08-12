@@ -145,12 +145,20 @@
     if (!rect) return;
 
     const gutter = 12;
-    const dockWidth = Math.min(250, Math.max(44, (rect.width || 0) - gutter * 2));
-    const left = Math.max(gutter, Math.min((rect.right || window.innerWidth) - dockWidth - gutter, window.innerWidth - dockWidth - gutter));
+    const isChatGPT = adapter.id === "chatgpt";
+    const dockWidth = isChatGPT
+      ? Math.max(180, Math.min(rect.width || 768, 768, window.innerWidth - gutter * 2))
+      : Math.min(250, Math.max(44, (rect.width || 0) - gutter * 2));
+    const left = isChatGPT
+      ? Math.max(gutter, Math.min(rect.left || gutter, window.innerWidth - dockWidth - gutter))
+      : Math.max(gutter, Math.min((rect.right || window.innerWidth) - dockWidth - gutter, window.innerWidth - dockWidth - gutter));
     const triggerHeight = trigger?.offsetHeight || 28;
-    // Dock in the empty upper-right area of the composer. This leaves the
-    // typing start and the action toolbar unobstructed on sites such as Doubao.
-    const triggerTop = Math.max(gutter, Math.min((rect.top || gutter) + gutter, window.innerHeight - triggerHeight - gutter));
+    // ChatGPT has a stable, shallow composer, so preserve its original
+    // full-width placement above the box. Other sites use the right-side dock
+    // to protect their taller Flex/Grid composers and action toolbars.
+    const triggerTop = isChatGPT
+      ? Math.max(gutter, Math.min((rect.top || gutter) - triggerHeight - 8, window.innerHeight - triggerHeight - gutter))
+      : Math.max(gutter, Math.min((rect.top || gutter) + gutter, window.innerHeight - triggerHeight - gutter));
 
     if (trigger?.isConnected) Object.assign(trigger.style, { left: `${left}px`, top: `${triggerTop}px`, width: `${dockWidth}px` });
     if (restoreBar?.isConnected) {
