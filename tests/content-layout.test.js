@@ -15,6 +15,7 @@ assert.match(content, /const isChatGPT = adapter\.id === "chatgpt"/);
 assert.match(content, /preserve its original[\s\S]*full-width placement above the box/);
 assert.match(content, /\(rect\.right \|\| window\.innerWidth\) - dockWidth - gutter/);
 assert.match(content, /\(rect\.top \|\| gutter\) - triggerHeight - 8/);
+assert.match(content, /triggerTop - restoreHeight - 8/);
 assert.match(content, /window\.addEventListener\("resize", scheduleDockPosition/);
 assert.match(content, /window\.addEventListener\("scroll", scheduleDockPosition/);
 assert.match(css, /\.ps-vault-trigger\s*\{\s*position:\s*fixed;/);

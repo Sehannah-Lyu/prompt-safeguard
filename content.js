@@ -163,9 +163,16 @@
     if (trigger?.isConnected) Object.assign(trigger.style, { left: `${left}px`, top: `${triggerTop}px`, width: `${dockWidth}px` });
     if (restoreBar?.isConnected) {
       const restoreHeight = restoreBar.offsetHeight || 54;
-      const restoreWidth = Math.min(360, Math.max(220, (rect.width || 0) - gutter * 2));
-      const restoreLeft = Math.max(gutter, Math.min((rect.right || window.innerWidth) - restoreWidth - gutter, window.innerWidth - restoreWidth - gutter));
-      Object.assign(restoreBar.style, { left: `${restoreLeft}px`, top: `${Math.max(gutter, (rect.top || gutter) - restoreHeight - 8)}px`, width: `${restoreWidth}px` });
+      const restoreWidth = isChatGPT
+        ? dockWidth
+        : Math.min(360, Math.max(220, (rect.width || 0) - gutter * 2));
+      const restoreLeft = isChatGPT
+        ? left
+        : Math.max(gutter, Math.min((rect.right || window.innerWidth) - restoreWidth - gutter, window.innerWidth - restoreWidth - gutter));
+      const restoreTop = isChatGPT
+        ? Math.max(gutter, triggerTop - restoreHeight - 8)
+        : Math.max(gutter, (rect.top || gutter) - restoreHeight - 8);
+      Object.assign(restoreBar.style, { left: `${restoreLeft}px`, top: `${restoreTop}px`, width: `${restoreWidth}px` });
     }
   }
 
