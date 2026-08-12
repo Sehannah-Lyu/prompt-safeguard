@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <rect width="1200" height="520" fill="#f7f7f5"/>
+  <text x="70" y="70" font-family="Arial, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#181914">2. 刷新或误关后，一键恢复</text>
+  <text x="70" y="108" font-family="Arial, Microsoft YaHei, sans-serif" font-size="18" fill="#70736a">再次进入同一对话，插件会主动提示未发送草稿</text>
+  <rect x="150" y="170" width="900" height="82" rx="16" fill="#23241e" stroke="#98a848" stroke-width="2"/>
+  <text x="182" y="220" font-family="Arial, Microsoft YaHei, sans-serif" font-size="27" fill="#d8f06f">✦</text>
+  <text x="226" y="203" font-family="Arial, Microsoft YaHei, sans-serif" font-size="18" font-weight="700" fill="#f2f1ea">发现未发送的草稿</text>
+  <text x="226" y="229" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#a9aca1">42 个字符 · 刚刚保存</text>
+  <rect x="858" y="190" width="112" height="42" rx="9" fill="#d8f06f"/>
+  <text x="890" y="217" font-family="Arial, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#171813">恢复</text>
+  <text x="1000" y="218" font-family="Arial, sans-serif" font-size="22" fill="#d7d8d1">×</text>
+  <rect x="150" y="276" width="900" height="160" rx="30" fill="#fff" stroke="#d7d9d2" stroke-width="2"/>
+  <text x="192" y="332" font-family="Arial, Microsoft YaHei, sans-serif" font-size="17" fill="#a0a39b">点击“恢复”后，草稿重新写回输入框</text>
+  <text x="192" y="382" font-family="Arial, Microsoft YaHei, sans-serif" font-size="21" fill="#242620">请帮我梳理这份用户访谈，提炼核心痛点、证据和产品机会……</text>
+</svg>

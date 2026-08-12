@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+  <defs><linearGradient id="panel" x1="0" x2="1"><stop stop-color="#23241e"/><stop offset="1" stop-color="#171813"/></linearGradient></defs>
+  <rect width="1200" height="620" fill="#f7f7f5"/>
+  <text x="70" y="70" font-family="Arial, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#181914">3. 从历史版本沉淀为常用 Prompt</text>
+  <text x="70" y="108" font-family="Arial, Microsoft YaHei, sans-serif" font-size="18" fill="#70736a">打开 Prompt Vault：恢复旧版本，或存为模板供后续任务复用</text>
+  <rect x="350" y="145" width="500" height="420" rx="22" fill="url(#panel)" stroke="#4b4d42" stroke-width="2"/>
+  <text x="382" y="181" font-family="Consolas, monospace" font-size="12" font-weight="700" fill="#d8f06f">PROMPT SAFEGUARD</text>
+  <text x="382" y="218" font-family="Georgia, Microsoft YaHei, serif" font-size="29" fill="#f3f0e6">Prompt Vault</text>
+  <rect x="704" y="176" width="104" height="28" rx="14" fill="#2b2d25" stroke="#555849"/>
+  <text x="728" y="195" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#c8cbbd">ChatGPT</text>
+  <rect x="377" y="242" width="446" height="43" rx="11" fill="#11120f"/>
+  <rect x="381" y="246" width="216" height="35" rx="8" fill="#d8f06f"/>
+  <text x="454" y="269" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" font-weight="700" fill="#171813">历史记录</text>
+  <text x="674" y="269" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#a5a79e">常用 Prompt</text>
+  <rect x="377" y="304" width="446" height="108" rx="12" fill="#292a24" stroke="#6b7450"/>
+  <text x="397" y="330" font-family="Consolas, monospace" font-size="12" fill="#d8f06f">最新版本 · 刚刚</text>
+  <text x="397" y="360" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#e2e0d7">梳理用户访谈，输出痛点、证据与产品机会……</text>
+  <rect x="397" y="378" width="112" height="25" rx="6" fill="#d8f06f"/>
+  <text x="416" y="396" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" font-weight="700" fill="#171813">恢复到输入框</text>
+  <rect x="519" y="378" width="92" height="25" rx="6" fill="none" stroke="#74776c"/>
+  <text x="538" y="396" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#deddd5">存为常用</text>
+  <rect x="377" y="427" width="446" height="92" rx="12" fill="#252620" stroke="#44463d"/>
+  <text x="397" y="453" font-family="Consolas, monospace" font-size="12" fill="#a8aa9f">版本 2 · 5 分钟前</text>
+  <text x="397" y="484" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#c9c8c0">分析访谈内容并给出产品建议……</text>
+  <path d="M870 378h95" stroke="#86a72f" stroke-width="3"/>
+  <path d="m956 370 12 8-12 8" fill="none" stroke="#86a72f" stroke-width="3"/>
+  <text x="878" y="349" font-family="Arial, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#56651d">一键沉淀</text>
+</svg>
