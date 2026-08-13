@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680">
+  <defs>
+    <linearGradient id="panel" x1="0" x2="1"><stop stop-color="#23241e"/><stop offset="1" stop-color="#171813"/></linearGradient>
+  </defs>
+  <rect width="1200" height="680" fill="#f7f7f5"/>
+  <text x="70" y="70" font-family="Arial, Microsoft YaHei, sans-serif" font-size="30" font-weight="700" fill="#181914">4. 自动折叠相似版本</text>
+  <text x="70" y="108" font-family="Arial, Microsoft YaHei, sans-serif" font-size="18" fill="#70736a">连续细改归入同一组，展开后仍可恢复保留的关键版本</text>
+
+  <rect x="275" y="140" width="650" height="485" rx="22" fill="url(#panel)" stroke="#4b4d42" stroke-width="2"/>
+  <text x="307" y="177" font-family="Consolas, monospace" font-size="12" font-weight="700" fill="#d8f06f">PROMPT SAFEGUARD</text>
+  <text x="307" y="214" font-family="Georgia, Microsoft YaHei, serif" font-size="29" fill="#f3f0e6">Prompt Vault</text>
+  <rect x="777" y="172" width="104" height="28" rx="14" fill="#2b2d25" stroke="#555849"/>
+  <text x="801" y="191" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#c8cbbd">ChatGPT</text>
+
+  <text x="307" y="250" font-family="Arial, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#f0eee5">当前对话的版本</text>
+  <text x="307" y="276" font-family="Consolas, monospace" font-size="12" fill="#9fa198">3 个版本组 · 保留 8 个关键版本</text>
+
+  <rect x="307" y="298" width="586" height="228" rx="14" fill="#292a24" stroke="#788153" stroke-width="2"/>
+  <circle cx="325" cy="327" r="5" fill="#d8f06f"/>
+  <text x="345" y="332" font-family="Consolas, monospace" font-size="12" fill="#a8aa9f">8 月 13 日 · 10:20</text>
+  <text x="800" y="332" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" font-weight="700" fill="#d8f06f">最新版本</text>
+  <text x="333" y="366" font-family="Arial, Microsoft YaHei, sans-serif" font-size="15" fill="#e4e2d8">梳理用户访谈，补充证据并给出产品机会……</text>
+
+  <rect x="333" y="387" width="534" height="38" rx="8" fill="#1d1e19" stroke="#46483e"/>
+  <text x="350" y="411" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#c7c9be">保留 6 个版本 · 已整理 12 个细微快照</text>
+  <text x="816" y="411" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" font-weight="700" fill="#d8f06f">收起 ↑</text>
+
+  <rect x="333" y="439" width="252" height="66" rx="9" fill="#23241f" stroke="#44463d"/>
+  <text x="349" y="463" font-family="Consolas, monospace" font-size="11" fill="#a8aa9f">保留版本 · 2 分钟前</text>
+  <text x="349" y="488" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#d1d0c7">补充访谈中的用户证据……</text>
+  <rect x="599" y="439" width="268" height="66" rx="9" fill="#23241f" stroke="#44463d"/>
+  <text x="615" y="463" font-family="Consolas, monospace" font-size="11" fill="#a8aa9f">保留版本 · 8 分钟前</text>
+  <text x="615" y="488" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#d1d0c7">初版：提炼访谈核心痛点……</text>
+
+  <rect x="307" y="542" width="586" height="55" rx="12" fill="#252620" stroke="#44463d"/>
+  <circle cx="325" cy="569" r="4" fill="#77796f"/>
+  <text x="345" y="573" font-family="Arial, Microsoft YaHei, sans-serif" font-size="13" fill="#c9c8c0">另一主题：为咖啡品牌设计增长方案……</text>
+  <text x="807" y="573" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" fill="#a8aa9f">1 个版本 ↓</text>
+
+  <path d="M953 357h115" stroke="#86a72f" stroke-width="3"/>
+  <path d="m1059 349 12 8-12 8" fill="none" stroke="#86a72f" stroke-width="3"/>
+  <text x="955" y="324" font-family="Arial, Microsoft YaHei, sans-serif" font-size="16" font-weight="700" fill="#56651d">相似版本折叠为一组</text>
+  <text x="955" y="391" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#70736a">减少重复堆积</text>
+  <text x="955" y="416" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#70736a">保留关键演进节点</text>
+</svg>

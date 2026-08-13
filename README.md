@@ -42,7 +42,7 @@
 
 连续修改同一 Prompt 时，系统会在本地识别相似版本并自动折叠，保留最新版本与关键演进节点，避免历史记录过度堆积。
 
-![V3.2 本地相似度分组与渐进压缩](docs/images/04-version-grouping.png)
+![相似版本自动折叠与关键版本保留](docs/images/04-version-grouping.svg)
 
 ## 迭代
 
