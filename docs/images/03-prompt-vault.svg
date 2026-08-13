@@ -13,7 +13,7 @@
   <text x="454" y="269" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" font-weight="700" fill="#171813">历史记录</text>
   <text x="674" y="269" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#a5a79e">常用 Prompt</text>
   <rect x="377" y="304" width="446" height="108" rx="12" fill="#292a24" stroke="#6b7450"/>
-  <text x="397" y="330" font-family="Consolas, monospace" font-size="12" fill="#d8f06f">最新版本 · 刚刚</text>
+  <text x="397" y="330" font-family="Consolas, monospace" font-size="12" fill="#d8f06f">最新版本 · 保留 6 个版本 ↓</text>
   <text x="397" y="360" font-family="Arial, Microsoft YaHei, sans-serif" font-size="14" fill="#e2e0d7">梳理用户访谈，输出痛点、证据与产品机会……</text>
   <rect x="397" y="378" width="112" height="25" rx="6" fill="#d8f06f"/>
   <text x="416" y="396" font-family="Arial, Microsoft YaHei, sans-serif" font-size="12" font-weight="700" fill="#171813">恢复到输入框</text>

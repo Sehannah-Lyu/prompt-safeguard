@@ -10,6 +10,7 @@
   const HISTORY_PREFIX = "prompt-safeguard:history:";
   const DRAFT_PREFIX = "prompt-safeguard:draft:";
   const SITE_CONFIG_PREFIX = "prompt-safeguard:site-config:";
+  const HISTORY_MIGRATION_KEY = "prompt-safeguard:history-schema:v2";
 
   let editor = null;
   let adapter = Adapters.resolve(location.href);
@@ -33,7 +34,8 @@
     view: "list",
     editingPromptId: null,
     draftContent: "",
-    variablePromptId: null
+    variablePromptId: null,
+    expandedHistoryGroups: new Set()
   };
 
   function contextPath() {
@@ -94,6 +96,92 @@
         else resolve();
       });
     });
+  }
+
+  function canonicalScope(value) {
+    if (!String(value || "").startsWith("http")) return value;
+    try {
+      const resolved = Adapters.resolve(value);
+      return Adapters.scope(resolved, value);
+    } catch (error) {
+      return value;
+    }
+  }
+
+  async function migrateAndPruneHistories() {
+    const stored = await storageGet(null);
+    if (stored[HISTORY_MIGRATION_KEY] === Core.HISTORY_SCHEMA_VERSION) {
+      await pruneConversationHistories(stored);
+      return;
+    }
+    const histories = new Map();
+    const drafts = new Map();
+    const historyKeys = Object.keys(stored).filter((key) => key.startsWith(HISTORY_PREFIX));
+    const draftKeys = Object.keys(stored).filter((key) => key.startsWith(DRAFT_PREFIX));
+
+    for (const key of historyKeys) {
+      const scope = canonicalScope(key.slice(HISTORY_PREFIX.length));
+      const existing = histories.get(scope) || [];
+      histories.set(scope, [...existing, ...Core.flattenHistory(stored[key])]);
+    }
+    for (const key of draftKeys) {
+      const scope = canonicalScope(key.slice(DRAFT_PREFIX.length));
+      const draft = stored[key];
+      if (!draft?.text) continue;
+      const existing = drafts.get(scope);
+      if (!existing || Number(draft.updatedAt) > Number(existing.updatedAt)) drafts.set(scope, draft);
+    }
+
+    const scopes = new Set([...histories.keys(), ...drafts.keys()]);
+    const normalized = Core.selectRecentConversations([...scopes].map((scope) => {
+      const versions = histories.get(scope) || [];
+      const unique = versions
+        .sort((a, b) => a.createdAt - b.createdAt)
+        .filter((item, index, list) => !index || item.id !== list[index - 1].id || item.text !== list[index - 1].text);
+      const history = Core.normalizeHistory(unique);
+      history.updatedAt = Math.max(history.updatedAt, Number(drafts.get(scope)?.updatedAt) || 0);
+      return { scope, history, updatedAt: history.updatedAt };
+    }));
+
+    const retainedScopes = new Set(normalized.map((item) => item.scope));
+    const updates = {};
+    normalized.forEach(({ scope, history }) => {
+      if (history.groups.length) updates[`${HISTORY_PREFIX}${scope}`] = history;
+    });
+    drafts.forEach((draft, scope) => {
+      if (retainedScopes.has(scope)) updates[`${DRAFT_PREFIX}${scope}`] = draft;
+    });
+    await storageSet(updates);
+
+    const obsolete = [...historyKeys, ...draftKeys].filter((key) => {
+      const prefix = key.startsWith(HISTORY_PREFIX) ? HISTORY_PREFIX : DRAFT_PREFIX;
+      const originalScope = key.slice(prefix.length);
+      const canonical = canonicalScope(originalScope);
+      return originalScope !== canonical || !retainedScopes.has(canonical);
+    });
+    if (obsolete.length) await storageRemove(obsolete);
+    await storageSet({ [HISTORY_MIGRATION_KEY]: Core.HISTORY_SCHEMA_VERSION });
+  }
+
+  async function pruneConversationHistories(snapshot) {
+    const stored = snapshot || await storageGet(null);
+    const historyKeys = Object.keys(stored).filter((key) => key.startsWith(HISTORY_PREFIX) && !key.slice(HISTORY_PREFIX.length).startsWith("http"));
+    const draftKeys = Object.keys(stored).filter((key) => key.startsWith(DRAFT_PREFIX) && !key.slice(DRAFT_PREFIX.length).startsWith("http"));
+    const scopes = new Set([
+      ...historyKeys.map((key) => key.slice(HISTORY_PREFIX.length)),
+      ...draftKeys.map((key) => key.slice(DRAFT_PREFIX.length))
+    ]);
+    const retained = Core.selectRecentConversations([...scopes].map((scope) => {
+      const history = Core.normalizeHistory(stored[`${HISTORY_PREFIX}${scope}`] || []);
+      const draftUpdatedAt = Number(stored[`${DRAFT_PREFIX}${scope}`]?.updatedAt) || 0;
+      return { scope, updatedAt: Math.max(history.updatedAt, draftUpdatedAt) };
+    }));
+    const retainedScopes = new Set(retained.map((item) => item.scope));
+    const obsolete = [...historyKeys, ...draftKeys].filter((key) => {
+      const prefix = key.startsWith(HISTORY_PREFIX) ? HISTORY_PREFIX : DRAFT_PREFIX;
+      return !retainedScopes.has(key.slice(prefix.length));
+    });
+    if (obsolete.length) await storageRemove(obsolete);
   }
 
   function readEditor() {
@@ -203,20 +291,22 @@
     try {
       const keys = [historyKey(), draftKey(), legacyHistoryKey(), legacyDraftKey()];
       const stored = await storageGet(keys);
-      const history = Array.isArray(stored[historyKey()])
-        ? stored[historyKey()]
-        : (Array.isArray(stored[legacyHistoryKey()]) ? stored[legacyHistoryKey()] : []);
+      const history = stored[historyKey()] || stored[legacyHistoryKey()] || [];
       const nextHistory = Core.addHistoryVersion(history, text);
-      const changed = nextHistory.length !== history.length || nextHistory.at(-1)?.id !== history.at(-1)?.id;
+      const previousLatest = Core.flattenHistory(history).at(-1);
+      const nextLatest = Core.flattenHistory(nextHistory).at(-1);
+      const changed = nextLatest?.id !== previousLatest?.id;
       const updates = {};
       if (changed) updates[historyKey()] = nextHistory;
       if (text !== lastDraftText && stored[draftKey()]?.text !== text) {
         updates[draftKey()] = { text, updatedAt: Date.now() };
       }
       if (Object.keys(updates).length) await storageSet(updates);
+      if (changed) await pruneConversationHistories();
       lastDraftText = text;
       dirtySinceAttach = false;
-      setProtectionStatus(changed ? `已保存版本 ${nextHistory.length}` : "内容无变化", changed ? "saved" : "ready");
+      const versionCount = Core.flattenHistory(nextHistory).length;
+      setProtectionStatus(changed ? `已保存版本 ${versionCount}` : "内容无变化", changed ? "saved" : "ready");
       if (panel?.dataset.open === "true" && ui.tab === "history" && ui.view === "list") renderBody();
     } catch (error) {
       setProtectionStatus("保存失败", "error");
@@ -412,31 +502,49 @@
 
   async function loadHistoryVersions() {
     const stored = await storageGet([historyKey(), legacyHistoryKey()]);
-    return Array.isArray(stored[historyKey()])
-      ? stored[historyKey()]
-      : (Array.isArray(stored[legacyHistoryKey()]) ? stored[legacyHistoryKey()] : []);
+    return Core.normalizeHistory(stored[historyKey()] || stored[legacyHistoryKey()] || []);
   }
 
   async function renderHistory(body) {
-    const versions = await loadHistoryVersions();
+    const history = await loadHistoryVersions();
     const keyword = ui.query.trim().toLocaleLowerCase();
-    const filtered = versions.filter((version) => !keyword || version.text.toLocaleLowerCase().includes(keyword)).reverse();
-    const cards = filtered.map((version, index) => `
-      <article class="ps-history-card ${index === 0 ? "is-latest" : ""}">
+    const groups = history.groups.filter((group) => !keyword || group.versions.some((version) => version.text.toLocaleLowerCase().includes(keyword))).reverse();
+    const totalVersions = history.groups.reduce((sum, group) => sum + group.versions.length, 0);
+    const cards = groups.map((group, index) => {
+      const versions = group.versions.slice().reverse();
+      const latest = versions[0];
+      const expanded = ui.expandedHistoryGroups.has(group.id) || Boolean(keyword);
+      const olderCards = expanded ? versions.slice(1).map((version) => `
+        <div class="ps-history-version">
+          <div class="ps-card-meta"><span>${formatDate(version.createdAt)} · ${formatTime(version.createdAt)}</span><em>保留版本</em></div>
+          <p>${escapeHtml(preview(version.text))}</p>
+          <div class="ps-card-actions">
+            <button data-action="restore-history" data-id="${version.id}" type="button">恢复到输入框</button>
+            <button data-action="history-to-library" data-id="${version.id}" type="button">存为常用</button>
+          </div>
+        </div>`).join("") : "";
+      return `
+      <article class="ps-history-card ${index === 0 ? "is-latest" : ""}" data-group-id="${group.id}">
         <div class="ps-timeline-dot"></div>
         <div class="ps-card-meta">
-          <span>${formatDate(version.createdAt)} · ${formatTime(version.createdAt)}</span>
+          <span>${formatDate(latest.createdAt)} · ${formatTime(latest.createdAt)}</span>
           ${index === 0 ? "<em>最新版本</em>" : ""}
         </div>
-        <p>${escapeHtml(preview(version.text))}</p>
+        <p>${escapeHtml(preview(latest.text))}</p>
+        <button class="ps-group-toggle" data-action="toggle-history-group" data-id="${group.id}" type="button" aria-expanded="${expanded}">
+          <span>保留 ${group.versions.length} 个版本${group.discardedCount ? ` · 已整理 ${group.discardedCount} 个细微快照` : ""}</span>
+          <strong>${expanded ? "收起" : "展开"} ${expanded ? "↑" : "↓"}</strong>
+        </button>
         <div class="ps-card-actions">
-          <button data-action="restore-history" data-id="${version.id}" type="button">恢复到输入框</button>
-          <button data-action="history-to-library" data-id="${version.id}" type="button">存为常用</button>
+          <button data-action="restore-history" data-id="${latest.id}" type="button">恢复到输入框</button>
+          <button data-action="history-to-library" data-id="${latest.id}" type="button">存为常用</button>
         </div>
-      </article>`).join("");
+        ${olderCards ? `<div class="ps-history-versions">${olderCards}</div>` : ""}
+      </article>`;
+    }).join("");
     body.innerHTML = `
       <div class="ps-section-heading">
-        <div><strong>当前对话的版本</strong><span>${versions.length} 个版本 · 有变化时每 5 秒保存</span></div>
+        <div><strong>当前对话的版本</strong><span>${history.groups.length} 个版本组 · 保留 ${totalVersions} 个关键版本</span></div>
         <button class="ps-outline-button" data-action="snapshot-now" type="button">立即保存</button>
       </div>
       <div class="ps-history-list">${cards || `<div class="ps-empty"><strong>还没有历史版本</strong><span>开始输入，5 秒后第一个版本会出现在这里。</span></div>`}</div>`;
@@ -520,6 +628,11 @@
     if (!control) return;
     const { action, id } = control.dataset;
     if (action === "snapshot-now") return saveSnapshot();
+    if (action === "toggle-history-group") {
+      if (ui.expandedHistoryGroups.has(id)) ui.expandedHistoryGroups.delete(id);
+      else ui.expandedHistoryGroups.add(id);
+      return renderBody();
+    }
     if (action === "select-folder") {
       ui.folderId = id;
       return renderBody();
@@ -542,8 +655,8 @@
     }
 
     if (action === "restore-history" || action === "history-to-library") {
-      const versions = await loadHistoryVersions();
-      const version = versions.find((item) => item.id === id);
+      const history = await loadHistoryVersions();
+      const version = Core.flattenHistory(history).find((item) => item.id === id);
       if (!version) return;
       if (action === "restore-history") {
         replaceEditor(version.text);
@@ -756,6 +869,7 @@
   }
 
   async function initialize() {
+    await migrateAndPruneHistories();
     const stored = await storageGet(siteConfigKey());
     manualSelector = stored[siteConfigKey()]?.manualSelector || "";
     scanForEditor();
